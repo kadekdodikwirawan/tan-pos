@@ -1,178 +1,209 @@
-# 🍽️ Tanstack POS System - Restaurant Management
+# 🍽️ TanStack POS — Modern Restaurant Management System
 
-> **A modern, enterprise-grade Point of Sale system built for the next generation of restaurants**
+> **Transform your restaurant operations with a lightning-fast, real-time Point of Sale system built on cutting-edge web technologies.**
 
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue?logo=docker&logoColor=white)](https://docker.com)
-[![React](https://img.shields.io/badge/React-18.3.1-61DAFB?logo=react&logoColor=black)](https://reactjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6.2-3178C6?logo=typescript&logoColor=white)](https://typescriptlang.org)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://reactjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)](https://typescriptlang.org)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?logo=postgresql&logoColor=white)](https://postgresql.org)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.13-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-
-## 🌟 **Built with Modern Technologies**
-
-- **⚡ Fullstack:** React + TanStack Start + TypeScript + Tailwind CSS + shadcn/ui
-- **🗄️ Database:** PostgreSQL with comprehensive schema and optimized queries
-- **🐳 Infrastructure:** Docker containers with Docker Compose orchestration
-- **🔐 Security:** JWT authentication with role-based access control (RBAC)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.0-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
-## 📸 **Beautiful Professional Interface**
+## ✨ Why TanStack POS?
 
-### 🍽️ Server Interface - Intuitive Order Management
-![Dashboard Server Interface](gh-image/dashboard-server-interface.png)
-*Clean, modern interface designed for speed and efficiency with real-time updates*
+Running a restaurant is hard enough. Your software shouldn't make it harder.
 
-### 👨‍🍳 Enhanced Kitchen Display - As-Ready Service Workflow
-![Dashboard Kitchen Interface](gh-image/dashboard-kitchen-interface.png)
-*Professional tablet-optimized kitchen interface with individual item tracking and as-ready service*
+**TanStack POS** was built by people who understand the chaos of dinner rush—the server who needs to fire an order in seconds, the kitchen staff juggling a dozen tickets, the manager who needs real-time visibility into what's happening on the floor.
 
-**🎯 Kitchen Features:**
-- **Individual Item Checklists** - Mark each dish ready independently
-- **As-Ready Service** - Serve dishes as they're completed (real restaurant workflow)
-- **Sound Notifications** - Audio alerts for new orders, ready items, and served dishes
-- **Visual Progress Tracking** - "1 ready • 1 served • 1 cooking (67% complete)"
-- **Touch-Optimized Design** - 50px+ touch targets for tablet and TV screens
+This isn't just another POS system. It's a **complete restaurant operations platform** designed for how modern restaurants actually work:
 
-### ✨ **Enterprise-Grade Admin Tables**
-Our latest update includes **professional data tables** with:
-- 📊 **Advanced sorting & filtering** with TanStack Table
-- 🎨 **Beautiful visual design** with gradient avatars and color-coded indicators  
-- 📱 **Responsive layout** that works perfectly on tablets and desktop
-- ⚡ **Real-time search** with debouncing for instant results
-- 🔄 **Table/Cards view toggle** for optimal data visualization
+- 🚀 **Blazing fast** — Sub-second order entry, instant kitchen updates
+- 📱 **Works everywhere** — Desktop, tablet, or TV displays
+- 🔄 **Real-time sync** — Everyone sees the same data, instantly
+- 🎯 **Role-optimized** — Each staff member gets exactly what they need
 
 ---
 
-## 🚀 **Core Features**
+## 🖼️ See It In Action
 
-### 💼 **Complete POS Functionality**
-- **📋 Order Management**: Create, modify, and track customer orders with real-time kitchen updates
-- **👨‍🍳 Enhanced Kitchen Workflow**: Professional as-ready service system with individual item tracking, sound notifications, and tablet-optimized interface
-- **💳 Payment Processing**: Complete multi-step payment flow with receipt generation and payment history
-- **🍕 Product Management**: Full menu and category management with pricing, images, and inventory control
-- **🪑 Table Management**: Comprehensive table and seating arrangement system with availability tracking
-- **👥 Multi-Role Support**: Role-based access control (Admin, Manager, Server, Counter, Kitchen)
+### Overview Dashboard — Admin View
+![Dashboard Admin Interface](image/manager-dashboard.png)
+*Comprehensive insights into sales, active orders, and staff performance*
 
-### 🏢 **Advanced Admin Features**
-- **📊 Comprehensive Admin Dashboard**: Complete control center with navigation to all system areas
-- **🔄 Role-Based Interface Switching**: Admin can access and monitor all role interfaces seamlessly  
-- **👤 Staff Management**: Create, manage, and delete user accounts with role assignments and permissions
-- **💰 Financial Reporting**: Income reports, sales analytics, and performance metrics with visual charts
-- **⚙️ System Settings**: Restaurant configuration, currency settings, tax rates, and operational parameters
-- **📋 Menu Management**: Full CRUD operations for categories and products with advanced table views
+### Point of Sale — Speed Meets Simplicity
+![Dashboard Server Interface](image/waiter-pos.png)
+*Intuitive product grid with one-tap ordering, table management, and custom notes support*
 
-### 🎯 **Role-Specific Interfaces**
-- **🔑 Admin**: Full system access with comprehensive management dashboard and beautiful data tables
-- **🍽️ Server**: Streamlined dine-in order creation interface optimized for speed
-- **💰 Counter/Checkout**: All order types plus complete payment processing system
-- **👨‍🍳 Kitchen**: Order preparation workflow with status updates and timing management
+### Kitchen Display — Built for the Line
+![Dashboard Kitchen Interface](image/chef-KDS.png)
+*Real-time order queue with item-level tracking, audio alerts, and touch-friendly controls*
 
 ---
 
-## ⚡ **Quick Start**
+## 🎯 Key Features
 
-### 🚀 **One Command Startup**
+### For the Front of House
+
+| Feature | Description |
+|---------|-------------|
+| **Quick Order Entry** | Tap-to-add products, quantity modifiers, and special instructions |
+| **Table Management** | Visual floor plan with real-time status (available, occupied, reserved) |
+| **Order Types** | Dine-in, takeaway, and delivery — each with tailored workflows |
+| **Send to Kitchen** | Fire orders immediately or hold for coordinated service |
+| **Flexible Payments** | Cash, card, and digital wallet support with split-check options |
+| **Add to Open Orders** | Keep adding items to tables without closing the check |
+
+### For the Kitchen
+
+| Feature | Description |
+|---------|-------------|
+| **Real-Time Queue** | Orders appear instantly with item-by-item preparation tracking |
+| **Item-Level Status** | Mark individual dishes ready — perfect for "as-ready" service |
+| **Food vs Beverage Filter** | Focus on what matters — split kitchen and bar displays |
+| **Audio Notifications** | Never miss a new order with configurable sound alerts |
+| **Server Attribution** | See who ordered what, with timestamps for accountability |
+| **Cancel Pending Items** | Remove items before preparation starts |
+
+### For Management
+
+| Feature | Description |
+|---------|-------------|
+| **Unified Dashboard** | See all active orders, table status, and daily revenue at a glance |
+| **Staff Management** | Create accounts, assign roles, and manage permissions |
+| **Sales Analytics** | Track revenue by day, product, or category |
+| **Order History** | Complete audit trail with payment records |
+| **System Settings** | Configure tax rates, receipt formats, and business details |
+
+---
+
+## 🔐 Role-Based Access
+
+Every staff member gets a streamlined interface built for their job:
+
+| Role | What They See | What They Can Do |
+|------|---------------|------------------|
+| **Admin** | Everything | Full system configuration and all interfaces |
+| **Manager** | Dashboard + Reports | Oversight, refunds, and staff management |
+| **Server** | POS (Dine-in) | Create and manage table orders |
+| **Counter** | POS (All types) | All orders + payment processing |
+| **Kitchen** | Kitchen Display | View orders and update preparation status |
+
+---
+
+## 🚀 Get Started in 60 Seconds
+
+### Prerequisites
+- [Docker](https://docker.com) installed and running
+- That's it. Seriously.
+
+### Quick Start
+
 ```bash
-# Start the entire system (easiest way)
-npm run i
-npm run dev
+# Clone the repository
+git clone https://github.com/yourusername/tanstack-pos.git
+cd tanstack-pos
 
-# Or use Docker Compose directly  
+# Start everything with Docker
 docker-compose up -d
 
-# Access the applications
-Frontend: http://localhost:3000
-Database: localhost:5432
+# Or if you prefer npm
+npm install
+npm run dev
 ```
 
-### 🎭 **Demo Accounts**
+**Access the app:** [http://localhost:3000](http://localhost:3000)
 
-| Role | Username | Password | Access Level |
-|------|----------|----------|-------------|
-| **👑 Admin** | `admin` | `admin123` | Full system access, all interfaces, beautiful admin tables |
-| **📊 Manager** | `manager1` | `admin123` | Business operations and oversight with reporting |
-| **🍽️ Server** | `server1` / `server2` | `admin123` | Dine-in orders only with streamlined interface |
-| **💰 Counter** | `counter1` / `counter2` | `admin123` | All orders + complete payment processing |
-| **👨‍🍳 Kitchen** | `kitchen1` | `admin123` | Order preparation and status updates |
+### Demo Credentials
 
-### 🎯 **First Login Experience**
-1. **🌐 Navigate to**: http://localhost:3000
-2. **🔑 Login as Admin**: Use `admin` / `admin123` for full system access
-3. **📊 Explore Admin Dashboard**: Access all interfaces via the beautiful sidebar navigation
-4. **🔄 Switch Interfaces**: Admin can view Server, Counter, Kitchen, and POS interfaces  
-5. **⚙️ Manage System**: Create staff, manage menu with professional tables, configure settings
+| Role | Username | Password |
+|------|----------|----------|
+| Admin | `admin` | `admin123` |
+| Manager | `manager1` | `admin123` |
+| Server | `server1` | `admin123` |
+| Counter | `counter1` | `admin123` |
+| Kitchen | `kitchen1` | `admin123` |
 
 ---
 
-## 💻 **Technology Stack**
+## 🛠️ Tech Stack
 
-- **⚛️ TanStack Start** - Full-stack React framework with file-based routing
-- **⚛️ React** - Latest React with concurrent features and hooks
-- **📝 TypeScript** - Type-safe development with comprehensive type definitions
-- **📊 TanStack Table** - Powerful data table with sorting, filtering, and pagination
-- **🔄 TanStack Query** - Powerful data synchronization and caching
-- **🎨 Tailwind CSS** - Utility-first CSS framework for rapid UI development
-- **⚡ Vite** - Lightning-fast build tool and dev server
-- **🧩 shadcn/ui + Radix UI** - Beautiful, accessible component library
+This project leverages a modern, production-ready stack:
 
-### **🗄️ Database & Infrastructure**
-- **🐘 PostgreSQL 15-Alpine** - Robust relational database with advanced features
-- **📋 Comprehensive Schema** - Users, orders, products, payments, and audit logs
-- **🔒 Role-based Security** - Database-level access control and permissions
-- **⚡ Optimized Queries** - Strategically indexed for maximum performance
-- **🐳 Docker Compose** - Containerized development and production environments
-- **🟢 Node.js** - Modern JavaScript runtime for development tools
+**Frontend**
+- **TanStack Start** — Full-stack React framework with file-based routing
+- **React 19** — Latest concurrent features and server components
+- **TanStack Query** — Smart caching and real-time data synchronization
+- **TanStack Router** — Type-safe routing with automatic code splitting
+- **Tailwind CSS v4** — Utility-first styling with lightning CSS
+- **shadcn/ui** — Beautiful, accessible component primitives
 
----
+**Backend**
+- **tRPC** — End-to-end type safety between client and server
+- **Drizzle ORM** — Type-safe database queries with zero overhead
+- **PostgreSQL 15** — Battle-tested relational database
+- **Zod** — Runtime validation with static type inference
 
-## 🤝 **Support the Project**
-
-### 💝 **Open for Sponsorship & Donations**
-
-This project represents hundreds of hours of development work, creating a modern, professional POS system that's **completely free and open source**. If you find this project valuable:
-
-**🌟 Ways to Support:**
-- ⭐ **Star this repository** to show your appreciation
-- 🐛 **Report bugs** or suggest features to help improve the system
-- 💰 **Sponsor development** to help maintain and add new features
-- ☕ **Buy me a coffee** to fuel late-night coding sessions
-- 🗣️ **Share the project** with other restaurant owners or developers
-
-**💳 Donation Options:**
-- **🌟 GitHub Sponsors** - Support ongoing development
-- **💰 PayPal** - Send donations to: `arissetia.m@gmail.com` (one-time or recurring)
-- **💎 Cryptocurrency** - Contact for wallet addresses
-- **🏢 Commercial Licensing** - Enterprise support and customization available
-
-*Every contribution helps make this project better for everyone! 🙏*
+**Infrastructure**
+- **Docker Compose** — One-command development environment
+- **Vite** — Sub-second HMR and optimized production builds
 
 ---
 
-## 🚀 **Getting Started**
+## 📁 Project Structure
 
-### **Prerequisites**
-- Docker & Docker Compose
-- Git (for cloning the repository)
+```
+tanstack-pos/
+├── src/
+│   ├── components/      # Reusable UI components
+│   ├── routes/          # File-based routing (TanStack Router)
+│   │   └── dashboard/   # Protected dashboard routes
+│   ├── integrations/    # tRPC client and server setup
+│   ├── db/              # Drizzle schema and database utilities
+│   ├── lib/             # Shared utilities and auth context
+│   └── hooks/           # Custom React hooks
+├── database/
+│   └── init/            # SQL initialization scripts
+├── docker-compose.yml   # Container orchestration
+└── drizzle.config.ts    # Database migration config
+```
 
-## 🙏 **Acknowledgments**
+---
 
-- **⚛️ React Team** for the incredible frontend framework
-- **🎨 Tailwind CSS** for making beautiful designs accessible
-- **📊 TanStack** for the powerful table and query libraries
-- **🧩 shadcn/ui** for the beautiful component system
-- **🐳 Docker** for making deployment seamless
+## 🤝 Contributing
+
+We welcome contributions! Whether it's:
+
+- 🐛 **Bug reports** — Found something broken? Let us know
+- 💡 **Feature requests** — Have an idea? Open a discussion
+- 🔧 **Pull requests** — Ready to code? Check out open issues
+- 📖 **Documentation** — Help others get started faster
+
+---
+
+## 💝 Support the Project
+
+This project represents countless hours of development, design, and testing. If it's helped you:
+
+- ⭐ **Star the repo** — It helps others discover the project
+- 🐦 **Share it** — Tell other restaurant owners and developers
+- ☕ **Buy me a coffee** — Fuel the late-night coding sessions
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FF813F?logo=buy-me-a-coffee&logoColor=white)](https://buymeacoffee.com/kadekdodik)
+
+---
+
+## 📄 License
+
+MIT License — Use it, modify it, ship it. Just give credit where it's due.
 
 ---
 
 <div align="center">
 
-### **⭐ Star this project if you find it useful! ⭐**
+**Built with ❤️ for restaurants that refuse to settle for outdated software**
 
-**Built with ❤️ by developers, for developers**
-
-*Ready to transform your restaurant operations? Get started today!*
-
-[🚀 **Get Started**](#-quick-start) • [💝 **Support the Project**](#-support-the-project) • [📚 **Documentation**](docs/) • [🐛 **Report Issues**](issues/)
+[Get Started](#-get-started-in-60-seconds) · [Report Bug](../../issues) · [Request Feature](../../issues)
 
 </div>

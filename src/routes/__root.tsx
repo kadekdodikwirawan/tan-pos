@@ -1,18 +1,14 @@
 import {
   HeadContent,
+  Outlet,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-
-import Header from '../components/Header'
-
-import StoreDevtools from '../lib/demo-store-devtools'
-
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 import appCss from '../styles.css?url'
+
+import { AuthProvider } from '../lib/auth-context'
+import { Provider } from '../integrations/tanstack-query/root-provider'
 
 import type { QueryClient } from '@tanstack/react-query'
 
@@ -36,7 +32,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'TanStack POS - Restaurant Management',
       },
     ],
     links: [
@@ -47,31 +43,23 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
   }),
 
-  shellComponent: RootDocument,
+  component: RootComponent,
 })
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootComponent() {
+  const { queryClient } = Route.useRouteContext()
+  
   return (
     <html lang="en">
       <head>
         <HeadContent />
       </head>
-      <body>
-        <Header />
-        {children}
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            StoreDevtools,
-            TanStackQueryDevtools,
-          ]}
-        />
+      <body className="min-h-screen bg-slate-900">
+        <Provider queryClient={queryClient}>
+          <AuthProvider>
+            <Outlet />
+          </AuthProvider>
+        </Provider>
         <Scripts />
       </body>
     </html>
