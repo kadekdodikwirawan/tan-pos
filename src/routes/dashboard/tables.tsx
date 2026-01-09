@@ -66,7 +66,7 @@ function TablesPage() {
   const createTableMutation = useMutation(
     trpc.tables.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['tables'] })
+        queryClient.invalidateQueries({ queryKey: [['tables']] })
         setShowAddModal(false)
         setFormData({ tableNumber: '', capacity: 4, location: 'Indoor' })
       },
@@ -77,7 +77,7 @@ function TablesPage() {
   const updateTableMutation = useMutation(
     trpc.tables.update.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['tables'] })
+        queryClient.invalidateQueries({ queryKey: [['tables']] })
         setEditingTable(null)
       },
     })
@@ -87,7 +87,7 @@ function TablesPage() {
   const updateStatusMutation = useMutation(
     trpc.tables.updateStatus.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['tables'] })
+        queryClient.invalidateQueries({ queryKey: [['tables']] })
       },
     })
   )
@@ -96,7 +96,7 @@ function TablesPage() {
   const deleteTableMutation = useMutation(
     trpc.tables.delete.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['tables'] })
+        queryClient.invalidateQueries({ queryKey: [['tables']] })
       },
     })
   )

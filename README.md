@@ -102,8 +102,8 @@ Every staff member gets a streamlined interface built for their job:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/tanstack-pos.git
-cd tanstack-pos
+git clone https://github.com/yourusername/tan-pos.git
+cd tan-pos
 
 # Start everything with Docker
 docker-compose up -d

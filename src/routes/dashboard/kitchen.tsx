@@ -48,7 +48,7 @@ function KitchenPage() {
   const updateItemStatusMutation = useMutation(
     trpc.orders.updateItemStatus.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['orders'] })
+        queryClient.invalidateQueries({ queryKey: [['orders']] })
       },
     })
   )
@@ -57,7 +57,7 @@ function KitchenPage() {
   const removeItemMutation = useMutation(
     trpc.orders.removeItem.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['orders'] })
+        queryClient.invalidateQueries({ queryKey: [['orders']] })
       },
     })
   )
@@ -265,18 +265,6 @@ function KitchenPage() {
             </button>
           </div>
           <div className="flex items-center gap-2 px-3 py-2 bg-slate-800 rounded-lg border border-slate-700">
-            {categoryFilter !== 'all' && (
-              <span className="relative">
-                {categoryFilter === 'food' ? (
-                  <Coffee className="w-4 h-4 text-gray-500" />
-                ) : (
-                  <Utensils className="w-4 h-4 text-gray-500" />
-                )}
-                <span className="absolute inset-0 flex items-center justify-center">
-                  <span className="w-5 h-0.5 bg-gray-500 rotate-45" />
-                </span>
-              </span>
-            )}
             <Bell className="w-4 h-4 text-cyan-400" />
             <span className="text-sm text-gray-300">
               {orderCounts.pending + orderCounts.preparing} active orders

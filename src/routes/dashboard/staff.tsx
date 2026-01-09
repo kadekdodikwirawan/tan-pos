@@ -66,7 +66,7 @@ function StaffPage() {
   const createUserMutation = useMutation(
     trpc.users.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['users'] })
+        queryClient.invalidateQueries({ queryKey: [['users']] })
         setShowAddModal(false)
         setFormData({
           username: '',
@@ -84,7 +84,7 @@ function StaffPage() {
   const updateUserMutation = useMutation(
     trpc.users.update.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['users'] })
+        queryClient.invalidateQueries({ queryKey: [['users']] })
         setEditingStaff(null)
       },
     })
@@ -94,7 +94,7 @@ function StaffPage() {
   const deleteUserMutation = useMutation(
     trpc.users.delete.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['users'] })
+        queryClient.invalidateQueries({ queryKey: [['users']] })
       },
     })
   )

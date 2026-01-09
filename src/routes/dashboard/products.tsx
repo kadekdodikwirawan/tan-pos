@@ -66,7 +66,7 @@ function ProductsPage() {
   const createProductMutation = useMutation(
     trpc.products.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['products'] })
+        queryClient.invalidateQueries({ queryKey: [['products']] })
         setShowAddModal(false)
         setFormData({ name: '', price: '0', categoryId: 1, emoji: '🍽️' })
       },
@@ -77,7 +77,7 @@ function ProductsPage() {
   const updateProductMutation = useMutation(
     trpc.products.update.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['products'] })
+        queryClient.invalidateQueries({ queryKey: [['products']] })
         setEditingProduct(null)
       },
     })
@@ -87,7 +87,7 @@ function ProductsPage() {
   const toggleAvailabilityMutation = useMutation(
     trpc.products.toggleAvailability.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['products'] })
+        queryClient.invalidateQueries({ queryKey: [['products']] })
       },
     })
   )
@@ -96,7 +96,7 @@ function ProductsPage() {
   const deleteProductMutation = useMutation(
     trpc.products.delete.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['products'] })
+        queryClient.invalidateQueries({ queryKey: [['products']] })
       },
     })
   )

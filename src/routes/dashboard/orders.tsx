@@ -68,9 +68,9 @@ function OrdersPage() {
   const createPaymentMutation = useMutation(
     trpc.payments.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['orders'] })
-        queryClient.invalidateQueries({ queryKey: ['payments'] })
-        queryClient.invalidateQueries({ queryKey: ['tables'] })
+        queryClient.invalidateQueries({ queryKey: [['orders']] })
+        queryClient.invalidateQueries({ queryKey: [['payments']] })
+        queryClient.invalidateQueries({ queryKey: [['tables']] })
         refetchOrder()
         setShowPayment(false)
         setPaymentMethod(null)

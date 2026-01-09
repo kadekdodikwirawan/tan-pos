@@ -90,8 +90,8 @@ function POSPage() {
   const addItemMutation = useMutation(
     trpc.orders.addItem.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['tables'] })
-        queryClient.invalidateQueries({ queryKey: ['orders'] })
+        queryClient.invalidateQueries({ queryKey: [['tables']] })
+        queryClient.invalidateQueries({ queryKey: [['orders']] })
       },
     })
   )
@@ -100,8 +100,8 @@ function POSPage() {
   const createPaymentMutation = useMutation(
     trpc.payments.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['orders'] })
-        queryClient.invalidateQueries({ queryKey: ['tables'] })
+        queryClient.invalidateQueries({ queryKey: [['orders']] })
+        queryClient.invalidateQueries({ queryKey: [['tables']] })
         clearCart()
         setActiveOrderId(null)
         alert('Payment processed successfully!')

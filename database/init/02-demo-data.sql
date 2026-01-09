@@ -26,7 +26,6 @@ INSERT INTO categories (id, name, description, icon, sort_order, is_active) VALU
 (3, 'Pizza', 'Hand-tossed artisan pizzas', 'Pizza', 3, TRUE),
 (4, 'Beverages', 'Hot and cold drinks', 'Coffee', 4, TRUE),
 (5, 'Desserts', 'Sweet treats and desserts', 'IceCream', 5, TRUE),
-(6, 'Drinks', 'Alcoholic beverages', 'Wine', 6, TRUE);
 
 -- Reset sequence for categories
 SELECT setval('categories_id_seq', (SELECT MAX(id) FROM categories));
@@ -54,14 +53,12 @@ INSERT INTO products (id, name, description, price, category_id, emoji, is_avail
 -- Beverages (category_id = 4)
 (11, 'Cappuccino', 'Espresso with steamed milk foam', 4.99, 4, '☕', TRUE, 3),
 (12, 'Fresh Juice', 'Freshly squeezed seasonal fruit juice', 5.99, 4, '🧃', TRUE, 4),
+(15, 'Red Wine', 'House red wine by the glass', 12.99, 4, '🍷', TRUE, 1),
+(16, 'Beer', 'Draft beer selection', 6.99, 4, '🍺', TRUE, 1);
 
 -- Desserts (category_id = 5)
 (13, 'Chocolate Cake', 'Rich chocolate layer cake with ganache', 7.99, 5, '🍰', TRUE, 2),
 (14, 'Ice Cream', 'Three scoops of artisan ice cream', 6.99, 5, '🍨', TRUE, 2),
-
--- Drinks (category_id = 6)
-(15, 'Red Wine', 'House red wine by the glass', 12.99, 6, '🍷', TRUE, 1),
-(16, 'Beer', 'Draft beer selection', 6.99, 6, '🍺', TRUE, 1);
 
 -- Reset sequence for products
 SELECT setval('products_id_seq', (SELECT MAX(id) FROM products));
@@ -72,113 +69,27 @@ SELECT setval('products_id_seq', (SELECT MAX(id) FROM products));
 INSERT INTO tables (id, table_number, capacity, status, location) VALUES
 -- Indoor tables
 (1, '1', 2, 'available', 'Indoor'),
-(2, '2', 4, 'occupied', 'Indoor'),
+(2, '2', 4, 'available', 'Indoor'),
 (3, '3', 4, 'available', 'Indoor'),
-(4, '4', 6, 'reserved', 'Indoor'),
-(5, '5', 4, 'occupied', 'Indoor'),
+(4, '4', 6, 'available', 'Indoor'),
+(5, '5', 4, 'available', 'Indoor'),
 (6, '6', 2, 'available', 'Indoor'),
-(7, '7', 8, 'cleaning', 'Indoor'),
+(7, '7', 8, 'available', 'Indoor'),
 (8, '8', 4, 'available', 'Indoor'),
 -- Outdoor tables
 (9, 'O1', 4, 'available', 'Outdoor'),
-(10, 'O2', 6, 'occupied', 'Outdoor'),
+(10, 'O2', 6, 'available', 'Outdoor'),
 (11, 'O3', 4, 'available', 'Outdoor'),
-(12, 'O4', 2, 'reserved', 'Outdoor'),
+(12, 'O4', 2, 'available', 'Outdoor'),
 -- VIP tables
 (13, 'V1', 10, 'available', 'VIP'),
-(14, 'V2', 8, 'occupied', 'VIP'),
+(14, 'V2', 8, 'available', 'VIP'),
 -- Bar tables
 (15, 'B1', 6, 'available', 'Bar'),
 (16, 'B2', 4, 'available', 'Bar');
 
 -- Reset sequence for tables
 SELECT setval('tables_id_seq', (SELECT MAX(id) FROM tables));
-
--- =====================================================
--- ORDERS (Demo orders)
--- =====================================================
-INSERT INTO orders (id, order_number, order_type, status, table_id, server_id, subtotal, tax_amount, total, created_at) VALUES
-(1, 'ORD-001', 'dine_in', 'preparing', 5, 3, 45.80, 4.58, 50.38, NOW() - INTERVAL '5 minutes'),
-(2, 'ORD-002', 'dine_in', 'ready', 2, 4, 28.50, 2.85, 31.35, NOW() - INTERVAL '8 minutes'),
-(3, 'ORD-003', 'takeaway', 'pending', NULL, 5, 67.20, 6.72, 73.92, NOW() - INTERVAL '12 minutes'),
-(4, 'ORD-004', 'dine_in', 'served', 3, 3, 52.00, 5.20, 57.20, NOW() - INTERVAL '25 minutes'),
-(5, 'ORD-005', 'dine_in', 'completed', 8, 4, 89.90, 8.99, 98.89, NOW() - INTERVAL '45 minutes'),
-(6, 'ORD-006', 'delivery', 'preparing', NULL, 5, 42.00, 4.20, 46.20, NOW() - INTERVAL '15 minutes'),
-(7, 'ORD-007', 'dine_in', 'cancelled', 1, 3, 25.98, 2.60, 28.58, NOW() - INTERVAL '60 minutes'),
-(8, 'ORD-008', 'dine_in', 'preparing', 10, 4, 38.97, 3.90, 42.87, NOW() - INTERVAL '10 minutes'),
-(9, 'ORD-009', 'dine_in', 'served', 14, 3, 76.96, 7.70, 84.66, NOW() - INTERVAL '30 minutes');
-
--- Reset sequence for orders
-SELECT setval('orders_id_seq', (SELECT MAX(id) FROM orders));
-
--- Update tables with current order references
-UPDATE tables SET current_order_id = 1 WHERE id = 5;
-UPDATE tables SET current_order_id = 2 WHERE id = 2;
-UPDATE tables SET current_order_id = 8 WHERE id = 10;
-UPDATE tables SET current_order_id = 9 WHERE id = 14;
-UPDATE tables SET reserved_for = '7:00 PM - John' WHERE id = 4;
-UPDATE tables SET reserved_for = '8:00 PM - Smith' WHERE id = 12;
-
--- =====================================================
--- ORDER ITEMS (Items in each order)
--- =====================================================
-INSERT INTO order_items (id, order_id, product_id, quantity, unit_price, subtotal, status, notes) VALUES
--- Order 1 items (ORD-001)
-(1, 1, 5, 2, 12.99, 25.98, 'preparing', 'No onions'),
-(2, 1, 1, 1, 9.99, 9.99, 'ready', NULL),
-(3, 1, 3, 2, 5.99, 11.98, 'pending', 'Extra crispy'),
-
--- Order 2 items (ORD-002)
-(4, 2, 6, 1, 22.99, 22.99, 'ready', NULL),
-(5, 2, 4, 1, 4.99, 4.99, 'ready', NULL),
-
--- Order 3 items (ORD-003)
-(6, 3, 10, 2, 16.99, 33.98, 'pending', NULL),
-(7, 3, 9, 1, 14.99, 14.99, 'pending', NULL),
-(8, 3, 4, 2, 4.99, 9.98, 'pending', NULL),
-
--- Order 4 items (ORD-004)
-(9, 4, 8, 1, 28.99, 28.99, 'served', 'Medium rare'),
-(10, 4, 15, 2, 12.99, 25.98, 'served', NULL),
-
--- Order 5 items (ORD-005)
-(11, 5, 5, 2, 12.99, 25.98, 'completed', NULL),
-(12, 5, 7, 2, 15.99, 31.98, 'completed', NULL),
-(13, 5, 14, 1, 6.99, 6.99, 'completed', NULL),
-
--- Order 6 items (ORD-006)
-(14, 6, 2, 2, 11.99, 23.98, 'preparing', 'Extra sauce'),
-(15, 6, 3, 2, 5.99, 11.98, 'pending', NULL),
-
--- Order 7 items (ORD-007) - Cancelled
-(16, 7, 5, 1, 12.99, 12.99, 'cancelled', NULL),
-(17, 7, 16, 2, 6.99, 13.98, 'cancelled', NULL),
-
--- Order 8 items (ORD-008)
-(18, 8, 7, 2, 15.99, 31.98, 'preparing', 'Gluten-free pasta'),
-(19, 8, 16, 1, 6.99, 6.99, 'served', NULL),
-
--- Order 9 items (ORD-009)
-(20, 9, 8, 2, 28.99, 57.98, 'served', 'One medium, one well-done'),
-(21, 9, 15, 1, 12.99, 12.99, 'served', NULL),
-(22, 9, 4, 1, 4.99, 4.99, 'served', NULL);
-
--- Reset sequence for order_items
-SELECT setval('order_items_id_seq', (SELECT MAX(id) FROM order_items));
-
--- =====================================================
--- PAYMENTS
--- =====================================================
-INSERT INTO payments (id, payment_number, order_id, amount, method, status, transaction_id, processed_by, created_at) VALUES
-(1, 'PAY-001', 5, 98.89, 'card', 'paid', 'TXN_ABC123456', 5, NOW() - INTERVAL '40 minutes'),
-(2, 'PAY-002', 4, 57.20, 'cash', 'paid', NULL, 5, NOW() - INTERVAL '20 minutes'),
-(3, 'PAY-003', 7, 28.58, 'cash', 'cancelled', NULL, 6, NOW() - INTERVAL '55 minutes'),
-(4, 'PAY-004', 9, 84.66, 'card', 'paid', 'TXN_DEF789012', 5, NOW() - INTERVAL '25 minutes'),
-(5, 'PAY-005', 1, 50.38, 'digital_wallet', 'pending', 'TXN_GHI345678', 6, NOW() - INTERVAL '3 minutes'),
-(6, 'PAY-006', 2, 31.35, 'card', 'paid', 'TXN_JKL901234', 5, NOW() - INTERVAL '5 minutes');
-
--- Reset sequence for payments
-SELECT setval('payments_id_seq', (SELECT MAX(id) FROM payments));
 
 -- =====================================================
 -- SETTINGS (System configuration)
