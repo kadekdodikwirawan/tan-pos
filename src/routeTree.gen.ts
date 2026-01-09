@@ -22,6 +22,7 @@ import { Route as DashboardPosRouteImport } from './routes/dashboard/pos'
 import { Route as DashboardPaymentsRouteImport } from './routes/dashboard/payments'
 import { Route as DashboardOrdersRouteImport } from './routes/dashboard/orders'
 import { Route as DashboardKitchenRouteImport } from './routes/dashboard/kitchen'
+import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -88,6 +89,11 @@ const DashboardKitchenRoute = DashboardKitchenRouteImport.update({
   path: '/kitchen',
   getParentRoute: () => DashboardRoute,
 } as any)
+const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
+  id: '/api/trpc/$',
+  path: '/api/trpc/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/staff': typeof DashboardStaffRoute
   '/dashboard/tables': typeof DashboardTablesRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/trpc/$': typeof ApiTrpcSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/dashboard/staff': typeof DashboardStaffRoute
   '/dashboard/tables': typeof DashboardTablesRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/api/trpc/$': typeof ApiTrpcSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/dashboard/staff': typeof DashboardStaffRoute
   '/dashboard/tables': typeof DashboardTablesRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/trpc/$': typeof ApiTrpcSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/dashboard/staff'
     | '/dashboard/tables'
     | '/dashboard/'
+    | '/api/trpc/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/dashboard/staff'
     | '/dashboard/tables'
     | '/dashboard'
+    | '/api/trpc/$'
   id:
     | '__root__'
     | '/'
@@ -179,12 +190,14 @@ export interface FileRouteTypes {
     | '/dashboard/staff'
     | '/dashboard/tables'
     | '/dashboard/'
+    | '/api/trpc/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   LoginRoute: typeof LoginRoute
+  ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -280,6 +293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardKitchenRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/api/trpc/$': {
+      id: '/api/trpc/$'
+      path: '/api/trpc/$'
+      fullPath: '/api/trpc/$'
+      preLoaderRoute: typeof ApiTrpcSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -317,6 +337,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRouteWithChildren,
   LoginRoute: LoginRoute,
+  ApiTrpcSplatRoute: ApiTrpcSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
