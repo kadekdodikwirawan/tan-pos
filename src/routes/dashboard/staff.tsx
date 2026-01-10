@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useTRPC } from '../../integrations/trpc/react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { RoleGuard } from '../../components/RoleGuard'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
@@ -20,6 +20,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import { getRoleDisplayName, getRoleColor } from '../../lib/auth'
+import { admin } from '../../lib/auth-client'
 
 export const Route = createFileRoute('/dashboard/staff')({
   component: () => (
@@ -30,7 +31,7 @@ export const Route = createFileRoute('/dashboard/staff')({
 })
 
 interface StaffMember {
-  id: number
+  id: string // Changed from number to string (TEXT id)
   username: string
   fullName: string
   email: string | null
@@ -42,7 +43,6 @@ interface StaffMember {
 
 function StaffPage() {
   const trpc = useTRPC()
-  const queryClient = useQueryClient()
 
   const [searchQuery, setSearchQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('all')
@@ -60,44 +60,37 @@ function StaffPage() {
   })
 
   // Fetch staff from database
-  const { data: staffData = [], isLoading } = useQuery(trpc.users.list.queryOptions())
+  const { data: staffData = [], isLoading, refetch } = useQuery(trpc.users.list.queryOptions())
 
-  // Create user mutation
-  const createUserMutation = useMutation(
-    trpc.users.create.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [['users']] })
-        setShowAddModal(false)
-        setFormData({
-          username: '',
-          fullName: '',
-          email: '',
-          phone: '',
-          role: 'server',
-          password: '',
-        })
-      },
-    })
-  )
+  // State for mutation loading
+  const [isCreating, setIsCreating] = useState(false)
+  const [createError, setCreateError] = useState<string | null>(null)
 
-  // Update user mutation
+  // Update user mutation (for non-auth fields like role, phone)
   const updateUserMutation = useMutation(
     trpc.users.update.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [['users']] })
+        refetch()
         setEditingStaff(null)
       },
     })
   )
 
-  // Delete user mutation
-  const deleteUserMutation = useMutation(
-    trpc.users.delete.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [['users']] })
-      },
-    })
-  )
+  // Delete user mutation - use better-auth admin API
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm('Are you sure you want to delete this staff member?')) return
+    
+    try {
+      const result = await admin.removeUser({ userId })
+      if (result.error) {
+        alert(`Failed to delete: ${result.error.message}`)
+      } else {
+        refetch()
+      }
+    } catch (err) {
+      alert('Failed to delete user')
+    }
+  }
 
   // Transform staff data
   const staff: StaffMember[] = staffData.map((s) => ({
@@ -132,30 +125,72 @@ function StaffPage() {
   }
 
   // Toggle active status
-  const toggleActive = (staffMember: StaffMember) => {
-    updateUserMutation.mutate({
-      id: staffMember.id,
-      isActive: !staffMember.isActive,
-    })
-  }
-
-  // Delete staff
-  const handleDelete = (staffId: number) => {
-    if (confirm('Are you sure you want to delete this staff member?')) {
-      deleteUserMutation.mutate({ id: staffId })
+  const toggleActive = async (staffMember: StaffMember) => {
+    if (staffMember.isActive) {
+      // Ban user (set isActive = false)
+      const result = await admin.banUser({ 
+        userId: staffMember.id,
+        banReason: 'Deactivated by admin'
+      })
+      if (!result.error) {
+        refetch()
+      }
+    } else {
+      // Unban user (set isActive = true)
+      const result = await admin.unbanUser({ userId: staffMember.id })
+      if (!result.error) {
+        refetch()
+      }
     }
   }
 
-  // Add staff
-  const handleAdd = () => {
-    createUserMutation.mutate({
-      username: formData.username,
-      password: formData.password,
-      fullName: formData.fullName,
-      email: formData.email || undefined,
-      phone: formData.phone || undefined,
-      role: formData.role as 'admin' | 'manager' | 'server' | 'counter' | 'kitchen',
-    })
+  // Add staff using better-auth admin API
+  const handleAdd = async () => {
+    if (!formData.username || !formData.password || !formData.fullName || !formData.email) {
+      setCreateError('Please fill in all required fields')
+      return
+    }
+
+    setIsCreating(true)
+    setCreateError(null)
+
+    try {
+      // Create user with better-auth admin API
+      // Note: better-auth only supports 'admin' and 'user' roles by default
+      // We pass our custom role via the data field
+      const result = await admin.createUser({
+        email: formData.email,
+        password: formData.password,
+        name: formData.fullName,
+        role: formData.role === 'admin' ? 'admin' : 'user',
+        data: {
+          username: formData.username,
+          fullName: formData.fullName,
+          phone: formData.phone || null,
+          isActive: true,
+          role: formData.role, // Store our custom POS role
+        },
+      })
+
+      if (result.error) {
+        setCreateError(result.error.message || 'Failed to create user')
+      } else {
+        setShowAddModal(false)
+        setFormData({
+          username: '',
+          fullName: '',
+          email: '',
+          phone: '',
+          role: 'server',
+          password: '',
+        })
+        refetch()
+      }
+    } catch (err: any) {
+      setCreateError(err.message || 'Failed to create user')
+    } finally {
+      setIsCreating(false)
+    }
   }
 
   // Save edit
@@ -334,7 +369,7 @@ function StaffPage() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDelete(member.id)}
+                        onClick={() => handleDeleteUser(member.id)}
                         className="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-slate-700"
                         disabled={member.role === 'admin'}
                       >
@@ -458,6 +493,12 @@ function StaffPage() {
                   />
                 </div>
               )}
+
+              {createError && (
+                <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                  {createError}
+                </div>
+              )}
             </div>
 
             <div className="p-6 border-t border-slate-700 flex gap-3">
@@ -467,6 +508,7 @@ function StaffPage() {
                 onClick={() => {
                   setShowAddModal(false)
                   setEditingStaff(null)
+                  setCreateError(null)
                 }}
               >
                 Cancel
@@ -474,8 +516,15 @@ function StaffPage() {
               <Button
                 className="flex-1 bg-cyan-500 hover:bg-cyan-600"
                 onClick={editingStaff ? handleSaveEdit : handleAdd}
+                disabled={isCreating}
               >
-                {editingStaff ? 'Save Changes' : 'Add Staff'}
+                {isCreating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : editingStaff ? (
+                  'Save Changes'
+                ) : (
+                  'Add Staff'
+                )}
               </Button>
             </div>
           </div>

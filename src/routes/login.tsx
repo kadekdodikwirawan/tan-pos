@@ -1,7 +1,9 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useAuth } from '../lib/auth-context'
-import { authenticateUser, getRoleDisplayName } from '../lib/auth'
+import { signIn } from '../lib/auth-client'
+import { demoAccounts, getDefaultRouteForRole, getRoleDisplayName } from '../lib/auth'
+import type { UserRole } from '../lib/auth-store'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
@@ -26,12 +28,12 @@ function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { login, isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
   const navigate = useNavigate()
 
-  // If already authenticated, redirect to dashboard
-  if (isAuthenticated) {
-    navigate({ to: '/dashboard' })
+  // If already authenticated, redirect to appropriate dashboard
+  if (isAuthenticated && user) {
+    navigate({ to: getDefaultRouteForRole(user.role) })
     return null
   }
 
@@ -41,60 +43,35 @@ function LoginPage() {
     setIsLoading(true)
 
     try {
-      const result = await authenticateUser(username, password)
+      const { data, error: signInError } = await signIn.username({
+        username,
+        password,
+      })
 
-      if (result.success && result.user) {
-        login(result.user)
-        // Redirect based on role
-        const roleRoutes: Record<string, string> = {
-          admin: '/dashboard',
-          manager: '/dashboard',
-          server: '/dashboard/pos',
-          counter: '/dashboard/pos',
-          kitchen: '/dashboard/kitchen',
-        }
-        navigate({ to: roleRoutes[result.user.role] || '/dashboard' })
-      } else {
-        setError(result.error || 'Login failed')
+      if (signInError) {
+        setError(signInError.message || 'Invalid credentials')
+        setIsLoading(false)
+        return
       }
-    } catch {
+
+      if (data?.user) {
+        // Session is automatically managed by better-auth
+        // Auth context will pick up the session change
+        const role = ((data.user as any).role as UserRole) || 'server'
+        navigate({ to: getDefaultRouteForRole(role) })
+      }
+    } catch (err) {
       setError('An error occurred. Please try again.')
-    } finally {
       setIsLoading(false)
     }
   }
 
-  const demoAccounts = [
-    {
-      role: 'admin',
-      username: 'admin',
-      icon: LayoutDashboard,
-      description: 'Full system access',
-    },
-    {
-      role: 'manager',
-      username: 'manager1',
-      icon: Users,
-      description: 'Business operations',
-    },
-    {
-      role: 'server',
-      username: 'server1',
-      icon: UtensilsCrossed,
-      description: 'Dine-in orders',
-    },
-    {
-      role: 'counter',
-      username: 'counter1',
-      icon: CreditCard,
-      description: 'Orders + payments',
-    },
-    {
-      role: 'kitchen',
-      username: 'kitchen1',
-      icon: ChefHat,
-      description: 'Order preparation',
-    },
+  const demoAccountsWithIcons = [
+    { ...demoAccounts[0], icon: LayoutDashboard },
+    { ...demoAccounts[1], icon: Users },
+    { ...demoAccounts[2], icon: UtensilsCrossed },
+    { ...demoAccounts[3], icon: CreditCard },
+    { ...demoAccounts[4], icon: ChefHat },
   ]
 
   const fillDemoAccount = (demoUsername: string) => {
@@ -189,7 +166,7 @@ function LoginPage() {
           </p>
 
           <div className="space-y-3">
-            {demoAccounts.map((account) => (
+            {demoAccountsWithIcons.map((account) => (
               <button
                 key={account.username}
                 type="button"

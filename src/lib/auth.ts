@@ -1,98 +1,63 @@
-import type { AuthUser } from './auth-store'
+import type { AuthUser, UserRole } from './auth-store'
 
-// Demo users for the POS system
-export const demoUsers: Record<string, { password: string; user: AuthUser }> = {
-  admin: {
-    password: 'admin123',
-    user: {
-      id: 1,
-      username: 'admin',
-      fullName: 'System Administrator',
-      role: 'admin',
-      email: 'admin@restaurant.com',
-    },
+// Demo accounts info (for display purposes only, auth happens via database)
+export const demoAccounts = [
+  {
+    role: 'admin' as UserRole,
+    username: 'admin',
+    description: 'Full system access',
   },
-  manager1: {
-    password: 'admin123',
-    user: {
-      id: 2,
-      username: 'manager1',
-      fullName: 'John Manager',
-      role: 'manager',
-      email: 'manager@restaurant.com',
-    },
+  {
+    role: 'manager' as UserRole,
+    username: 'manager1',
+    description: 'Business operations',
   },
-  server1: {
-    password: 'admin123',
-    user: {
-      id: 3,
-      username: 'server1',
-      fullName: 'Sarah Server',
-      role: 'server',
-      email: 'server1@restaurant.com',
-    },
+  {
+    role: 'server' as UserRole,
+    username: 'server1',
+    description: 'Dine-in orders',
   },
-  server2: {
-    password: 'admin123',
-    user: {
-      id: 4,
-      username: 'server2',
-      fullName: 'Mike Waiter',
-      role: 'server',
-      email: 'server2@restaurant.com',
-    },
+  {
+    role: 'counter' as UserRole,
+    username: 'counter1',
+    description: 'Orders + payments',
   },
-  counter1: {
-    password: 'admin123',
-    user: {
-      id: 5,
-      username: 'counter1',
-      fullName: 'Emily Cashier',
-      role: 'counter',
-      email: 'counter1@restaurant.com',
-    },
+  {
+    role: 'kitchen' as UserRole,
+    username: 'kitchen1',
+    description: 'Order preparation',
   },
-  counter2: {
-    password: 'admin123',
-    user: {
-      id: 6,
-      username: 'counter2',
-      fullName: 'David Counter',
-      role: 'counter',
-      email: 'counter2@restaurant.com',
-    },
-  },
-  kitchen1: {
-    password: 'admin123',
-    user: {
-      id: 7,
-      username: 'kitchen1',
-      fullName: 'Chef Gordon',
-      role: 'kitchen',
-      email: 'kitchen@restaurant.com',
-    },
-  },
+]
+
+// Transform database user to AuthUser
+export function transformToAuthUser(dbUser: {
+  id: number | string
+  username: string
+  fullName: string
+  role: string
+  email: string | null
+  phone: string | null
+}): AuthUser {
+  return {
+    id: String(dbUser.id),
+    username: dbUser.username,
+    fullName: dbUser.fullName,
+    role: dbUser.role as UserRole,
+    email: dbUser.email,
+    phone: dbUser.phone,
+  }
 }
 
-// Simple authentication function (demo purposes)
-export async function authenticateUser(
-  username: string,
-  password: string
-): Promise<{ success: boolean; user?: AuthUser; error?: string }> {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 500))
-
-  const userRecord = demoUsers[username.toLowerCase()]
-
-  if (!userRecord) {
-    return { success: false, error: 'User not found' }
+// Get route for role after login
+export function getDefaultRouteForRole(role: UserRole): string {
+  const roleRoutes: Record<UserRole, string> = {
+    admin: '/dashboard',
+    manager: '/dashboard',
+    server: '/dashboard/pos',
+    counter: '/dashboard/pos',
+    kitchen: '/dashboard/kitchen',
   }
-
-  if (userRecord.password !== password) {
-    return { success: false, error: 'Invalid password' }
-  }
-
-  return { success: true, user: userRecord.user }
+  return roleRoutes[role] || '/dashboard'
 }
 
 // Get role display name

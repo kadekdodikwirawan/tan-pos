@@ -43,7 +43,6 @@ function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all')
   const [typeFilter, setTypeFilter] = useState<'all' | 'dine_in' | 'takeaway' | 'delivery'>('all')
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null)
-  const [showPayment, setShowPayment] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null)
 
   // Fetch orders from database
@@ -72,7 +71,6 @@ function OrdersPage() {
         queryClient.invalidateQueries({ queryKey: [['payments']] })
         queryClient.invalidateQueries({ queryKey: [['tables']] })
         refetchOrder()
-        setShowPayment(false)
         setPaymentMethod(null)
         alert('Payment processed successfully!')
       },
@@ -118,7 +116,7 @@ function OrdersPage() {
         orderId: selectedOrder.id,
         amount: selectedOrder.total || '0',
         method: paymentMethod as 'cash' | 'card' | 'digital_wallet',
-        processedBy: user?.id || 1,
+        processedBy: user?.id || '',
       })
     } catch (error) {
       alert('Error processing payment: ' + (error as Error).message)
@@ -128,7 +126,6 @@ function OrdersPage() {
   // Close modal and reset state
   const closeModal = () => {
     setSelectedOrderId(null)
-    setShowPayment(false)
     setPaymentMethod(null)
   }
 

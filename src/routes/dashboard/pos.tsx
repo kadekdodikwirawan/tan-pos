@@ -305,7 +305,7 @@ function POSPage() {
         orderId: orderId,
         amount: grandTotal.toFixed(2),
         method: paymentMethod as 'cash' | 'card' | 'digital_wallet',
-        processedBy: user?.id || 1,
+        processedBy: user?.id || '',
       })
 
       resetOrder()
@@ -515,8 +515,31 @@ function POSPage() {
                   >
                     <span className="text-xl">{item.productEmoji || '🍽️'}</span>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-sm text-gray-300 truncate">
+                      <h4 className="text-sm text-gray-300 truncate flex items-center gap-1.5">
                         {item.productName}
+                        <span
+                          className={`inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] ${
+                            item.status === 'pending'
+                              ? 'bg-yellow-500/20 text-yellow-400'
+                              : item.status === 'preparing'
+                                ? 'bg-orange-500/20 text-orange-400'
+                                : item.status === 'ready'
+                                  ? 'bg-green-500/20 text-green-400'
+                                  : item.status === 'served'
+                                    ? 'bg-blue-500/20 text-blue-400'
+                                    : item.status === 'cancelled'
+                                      ? 'bg-red-500/20 text-red-400'
+                                      : 'bg-gray-500/20 text-gray-400'
+                          }`}
+                          title={item.status}
+                        >
+                          {item.status === 'pending' && '⏳'}
+                          {item.status === 'preparing' && '🔥'}
+                          {item.status === 'ready' && '✓'}
+                          {item.status === 'served' && '✓'}
+                          {item.status === 'cancelled' && '✕'}
+                          {item.status === 'completed' && '✓'}
+                        </span>
                       </h4>
                       {item.notes && (
                         <p className="text-xs text-gray-500 truncate">

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { eq, desc, and, gte, lte, sql, ne, or } from 'drizzle-orm'
-import { createTRPCRouter, publicProcedure } from './init'
+import { createTRPCRouter, publicProcedure, protectedProcedure, adminProcedure } from './init'
 import { db } from '../../db'
 import {
   users,
@@ -15,21 +15,21 @@ import {
 import type { TRPCRouterRecord } from '@trpc/server'
 
 // =====================================================
-// USERS ROUTER
+// USERS ROUTER (Admin only)
 // =====================================================
 const usersRouter = {
-  list: publicProcedure.query(async () => {
-    return db.select().from(users).orderBy(users.id)
+  list: protectedProcedure.query(async () => {
+    return db.select().from(users).orderBy(users.username)
   }),
 
-  getById: publicProcedure
-    .input(z.object({ id: z.number() }))
+  getById: protectedProcedure
+    .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
       const result = await db.select().from(users).where(eq(users.id, input.id))
       return result[0] || null
     }),
 
-  getByUsername: publicProcedure
+  getByUsername: protectedProcedure
     .input(z.object({ username: z.string() }))
     .query(async ({ input }) => {
       const result = await db
@@ -39,46 +39,38 @@ const usersRouter = {
       return result[0] || null
     }),
 
+  // Note: Authentication is now handled by better-auth at /api/auth/*
+  // This legacy endpoint is kept for backward compatibility
   authenticate: publicProcedure
     .input(z.object({ username: z.string(), password: z.string() }))
-    .mutation(async ({ input }) => {
-      const result = await db
-        .select()
-        .from(users)
-        .where(
-          and(
-            eq(users.username, input.username),
-            eq(users.password, input.password),
-            eq(users.isActive, true)
-          )
-        )
-      if (result[0]) {
-        const { password: _, ...userWithoutPassword } = result[0]
-        return { success: true, user: userWithoutPassword }
-      }
-      return { success: false, error: 'Invalid credentials' }
+    .mutation(async () => {
+      // This is deprecated - use better-auth signIn.username() instead
+      return { success: false, error: 'Use /api/auth/sign-in/username endpoint' }
     }),
 
-  create: publicProcedure
+  // Note: User creation is now handled by better-auth admin API
+  // Use authClient.admin.createUser() instead
+  // This endpoint is deprecated
+  create: adminProcedure
     .input(
       z.object({
+        id: z.string().optional(),
         username: z.string(),
-        password: z.string(),
+        email: z.string(),
         fullName: z.string(),
         role: z.enum(['admin', 'manager', 'server', 'counter', 'kitchen']),
-        email: z.string().optional(),
         phone: z.string().optional(),
       })
     )
-    .mutation(async ({ input }) => {
-      const result = await db.insert(users).values(input).returning()
-      return result[0]
+    .mutation(async () => {
+      // Deprecated - use better-auth admin.createUser() instead
+      return { error: 'Use better-auth admin.createUser() API' }
     }),
 
-  update: publicProcedure
+  update: adminProcedure
     .input(
       z.object({
-        id: z.number(),
+        id: z.string(),
         fullName: z.string().optional(),
         role: z.enum(['admin', 'manager', 'server', 'counter', 'kitchen']).optional(),
         email: z.string().optional(),
@@ -92,11 +84,13 @@ const usersRouter = {
       return result[0]
     }),
 
-  delete: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ input }) => {
-      await db.delete(users).where(eq(users.id, input.id))
-      return { success: true }
+  // Note: User deletion is now handled by better-auth admin API
+  // Use authClient.admin.removeUser() instead
+  delete: adminProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async () => {
+      // Deprecated - use better-auth admin.removeUser() instead
+      return { error: 'Use better-auth admin.removeUser() API' }
     }),
 } satisfies TRPCRouterRecord
 
@@ -104,18 +98,18 @@ const usersRouter = {
 // CATEGORIES ROUTER
 // =====================================================
 const categoriesRouter = {
-  list: publicProcedure.query(async () => {
+  list: protectedProcedure.query(async () => {
     return db.select().from(categories).where(eq(categories.isActive, true)).orderBy(categories.sortOrder)
   }),
 
-  getById: publicProcedure
+  getById: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
       const result = await db.select().from(categories).where(eq(categories.id, input.id))
       return result[0] || null
     }),
 
-  create: publicProcedure
+  create: adminProcedure
     .input(
       z.object({
         name: z.string(),
@@ -129,7 +123,7 @@ const categoriesRouter = {
       return result[0]
     }),
 
-  update: publicProcedure
+  update: adminProcedure
     .input(
       z.object({
         id: z.number(),
@@ -146,7 +140,7 @@ const categoriesRouter = {
       return result[0]
     }),
 
-  delete: publicProcedure
+  delete: adminProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
       await db.update(categories).set({ isActive: false }).where(eq(categories.id, input.id))
@@ -158,7 +152,7 @@ const categoriesRouter = {
 // PRODUCTS ROUTER
 // =====================================================
 const productsRouter = {
-  list: publicProcedure.query(async () => {
+  list: protectedProcedure.query(async () => {
     return db
       .select({
         id: products.id,
@@ -178,7 +172,7 @@ const productsRouter = {
       .orderBy(categories.sortOrder, products.name)
   }),
 
-  listAvailable: publicProcedure.query(async () => {
+  listAvailable: protectedProcedure.query(async () => {
     return db
       .select({
         id: products.id,
@@ -198,7 +192,7 @@ const productsRouter = {
       .orderBy(categories.sortOrder, products.name)
   }),
 
-  getById: publicProcedure
+  getById: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
       const result = await db
@@ -209,7 +203,7 @@ const productsRouter = {
       return result[0] || null
     }),
 
-  getByCategory: publicProcedure
+  getByCategory: protectedProcedure
     .input(z.object({ categoryId: z.number() }))
     .query(async ({ input }) => {
       return db
@@ -219,7 +213,7 @@ const productsRouter = {
         .orderBy(products.name)
     }),
 
-  create: publicProcedure
+  create: adminProcedure
     .input(
       z.object({
         name: z.string(),
@@ -236,7 +230,7 @@ const productsRouter = {
       return result[0]
     }),
 
-  update: publicProcedure
+  update: adminProcedure
     .input(
       z.object({
         id: z.number(),
@@ -256,7 +250,7 @@ const productsRouter = {
       return result[0]
     }),
 
-  toggleAvailability: publicProcedure
+  toggleAvailability: adminProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
       const product = await db.select().from(products).where(eq(products.id, input.id))
@@ -271,7 +265,7 @@ const productsRouter = {
       return null
     }),
 
-  delete: publicProcedure
+  delete: adminProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
       await db.update(products).set({ isAvailable: false }).where(eq(products.id, input.id))
@@ -283,7 +277,7 @@ const productsRouter = {
 // TABLES ROUTER
 // =====================================================
 const tablesRouter = {
-  list: publicProcedure.query(async () => {
+  list: protectedProcedure.query(async () => {
     return db
       .select({
         id: tables.id,
@@ -307,12 +301,12 @@ const tablesRouter = {
       return result[0] || null
     }),
 
-  getAvailable: publicProcedure.query(async () => {
+  getAvailable: protectedProcedure.query(async () => {
     return db.select().from(tables).where(eq(tables.status, 'available')).orderBy(tables.tableNumber)
   }),
 
   // Get all tables for POS (available and occupied with their current orders)
-  getAllForPOS: publicProcedure.query(async () => {
+  getAllForPOS: protectedProcedure.query(async () => {
     return db
       .select({
         id: tables.id,
@@ -433,7 +427,7 @@ const tablesRouter = {
 // ORDERS ROUTER
 // =====================================================
 const ordersRouter = {
-  list: publicProcedure.query(async () => {
+  list: protectedProcedure.query(async () => {
     return db
       .select({
         id: orders.id,
@@ -459,7 +453,7 @@ const ordersRouter = {
       .orderBy(desc(orders.createdAt))
   }),
 
-  listActive: publicProcedure.query(async () => {
+  listActive: protectedProcedure.query(async () => {
     return db
       .select({
         id: orders.id,
@@ -483,7 +477,7 @@ const ordersRouter = {
       .orderBy(orders.createdAt)
   }),
 
-  listForKitchen: publicProcedure.query(async () => {
+  listForKitchen: protectedProcedure.query(async () => {
     // Get orders that are not completed/cancelled and have pending/preparing items
     // This ensures orders with new items show up even if some items are already served
     const kitchenOrders = await db
@@ -594,7 +588,7 @@ const ordersRouter = {
       z.object({
         orderType: z.enum(['dine_in', 'takeaway', 'delivery']),
         tableId: z.number().optional(),
-        serverId: z.number().optional(),
+        serverId: z.string().optional(),
         notes: z.string().optional(),
       })
     )
@@ -636,7 +630,7 @@ const ordersRouter = {
         productId: z.number(),
         quantity: z.number().default(1),
         notes: z.string().optional(),
-        serverId: z.number().optional(),
+        serverId: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -773,7 +767,7 @@ async function updateOrderTotals(orderId: number) {
 // PAYMENTS ROUTER
 // =====================================================
 const paymentsRouter = {
-  list: publicProcedure.query(async () => {
+  list: protectedProcedure.query(async () => {
     return db
       .select({
         id: payments.id,
@@ -810,7 +804,7 @@ const paymentsRouter = {
         orderId: z.number(),
         amount: z.string(),
         method: z.enum(['cash', 'card', 'digital_wallet']),
-        processedBy: z.number(),
+        processedBy: z.string(),
         transactionId: z.string().optional(),
       })
     )
@@ -855,7 +849,7 @@ const paymentsRouter = {
     }),
 
   refund: publicProcedure
-    .input(z.object({ id: z.number(), processedBy: z.number() }))
+    .input(z.object({ id: z.number(), processedBy: z.string() }))
     .mutation(async ({ input }) => {
       const result = await db
         .update(payments)
@@ -870,7 +864,7 @@ const paymentsRouter = {
 // SETTINGS ROUTER
 // =====================================================
 const settingsRouter = {
-  list: publicProcedure.query(async () => {
+  list: protectedProcedure.query(async () => {
     return db.select().from(settings).orderBy(settings.key)
   }),
 
@@ -924,7 +918,7 @@ const settingsRouter = {
 // REPORTS ROUTER
 // =====================================================
 const reportsRouter = {
-  getDashboardStats: publicProcedure.query(async () => {
+  getDashboardStats: protectedProcedure.query(async () => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
@@ -1009,7 +1003,7 @@ const reportsRouter = {
       return result
     }),
 
-  getSalesByCategory: publicProcedure.query(async () => {
+  getSalesByCategory: protectedProcedure.query(async () => {
     const result = await db
       .select({
         categoryId: categories.id,

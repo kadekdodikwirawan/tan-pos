@@ -52,8 +52,8 @@ function DashboardLayout() {
     return null
   }
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    await logout()
     navigate({ to: '/login' })
   }
 

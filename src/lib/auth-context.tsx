@@ -7,13 +7,13 @@ import {
   type UserRole,
   canAccessRoute,
 } from './auth-store'
+import { useSession, signOut } from './auth-client'
 
 interface AuthContextType {
   user: AuthUser | null
   isAuthenticated: boolean
   isLoading: boolean
-  login: (user: AuthUser) => void
-  logout: () => void
+  logout: () => Promise<void>
   canAccess: (route: string) => boolean
 }
 
@@ -23,22 +23,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const user = useStore(authStore, (state) => state.user)
   const isAuthenticated = useStore(authStore, (state) => state.isAuthenticated)
   const isLoading = useStore(authStore, (state) => state.isLoading)
+  
+  // Use better-auth session hook
+  const { data: session, isPending } = useSession()
 
+  // Sync better-auth session with our auth store
   useEffect(() => {
-    authActions.initializeAuth()
-  }, [])
+    if (isPending) {
+      authActions.setLoading(true)
+      return
+    }
+
+    if (session?.user) {
+      // Transform better-auth user to our AuthUser format
+      const authUser: AuthUser = {
+        id: session.user.id,
+        username: (session.user as any).username || session.user.email?.split('@')[0] || 'user',
+        fullName: session.user.name || 'User',
+        role: ((session.user as any).role as UserRole) || 'server',
+        email: session.user.email,
+        phone: (session.user as any).phone,
+      }
+      authActions.setUser(authUser)
+    } else {
+      authActions.setUser(null)
+    }
+  }, [session, isPending])
 
   const canAccess = (route: string): boolean => {
     if (!user) return false
     return canAccessRoute(user.role, route)
   }
 
+  const handleLogout = async () => {
+    await signOut()
+    authActions.logout()
+  }
+
   const value: AuthContextType = {
     user,
     isAuthenticated,
-    isLoading,
-    login: authActions.login,
-    logout: authActions.logout,
+    isLoading: isLoading || isPending,
+    logout: handleLogout,
     canAccess,
   }
 

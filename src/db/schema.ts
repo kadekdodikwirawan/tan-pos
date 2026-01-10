@@ -55,18 +55,69 @@ export const tableStatusEnum = pgEnum('table_status', [
   'cleaning',
 ])
 
-// Users table
+// Users table (combined POS users + better-auth fields)
+// Note: Passwords are stored in the 'account' table by better-auth
 export const users = pgTable('users', {
-  id: serial().primaryKey(),
+  id: text('id').primaryKey(),
   username: varchar('username', { length: 50 }).notNull().unique(),
-  password: varchar('password', { length: 255 }).notNull(),
+  displayUsername: varchar('display_username', { length: 50 }),
+  email: varchar('email', { length: 100 }).notNull().unique(),
+  emailVerified: boolean('email_verified').notNull().default(false),
   fullName: varchar('full_name', { length: 100 }).notNull(),
+  name: varchar('name', { length: 100 }),
+  image: text('image'),
   role: userRoleEnum('role').notNull().default('server'),
-  email: varchar('email', { length: 100 }),
   phone: varchar('phone', { length: 20 }),
   isActive: boolean('is_active').notNull().default(true),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  banned: boolean('banned').default(false),
+  banReason: text('ban_reason'),
+  banExpires: timestamp('ban_expires'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
+// Better-Auth Session table
+export const session = pgTable('session', {
+  id: text('id').primaryKey(),
+  expiresAt: timestamp('expires_at').notNull(),
+  token: text('token').notNull().unique(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  impersonatedBy: text('impersonated_by'),
+})
+
+// Better-Auth Account table
+export const account = pgTable('account', {
+  id: text('id').primaryKey(),
+  accountId: text('account_id').notNull(),
+  providerId: text('provider_id').notNull(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  accessToken: text('access_token'),
+  refreshToken: text('refresh_token'),
+  idToken: text('id_token'),
+  accessTokenExpiresAt: timestamp('access_token_expires_at'),
+  refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+  scope: text('scope'),
+  password: text('password'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
+// Better-Auth Verification table
+export const verification = pgTable('verification', {
+  id: text('id').primaryKey(),
+  identifier: text('identifier').notNull(),
+  value: text('value').notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
 
 // Categories table
@@ -120,7 +171,7 @@ export const orders = pgTable('orders', {
   status: orderStatusEnum('status').notNull().default('pending'),
   tableId: integer('table_id').references(() => tables.id),
   customerId: integer('customer_id'),
-  serverId: integer('server_id').references(() => users.id),
+  serverId: text('server_id').references(() => users.id),
   subtotal: decimal('subtotal', { precision: 10, scale: 2 }).default('0'),
   taxAmount: decimal('tax_amount', { precision: 10, scale: 2 }).default('0'),
   discountAmount: decimal('discount_amount', { precision: 10, scale: 2 }).default('0'),
@@ -140,7 +191,7 @@ export const orderItems = pgTable('order_items', {
   productId: integer('product_id')
     .notNull()
     .references(() => products.id),
-  serverId: integer('server_id').references(() => users.id),
+  serverId: text('server_id').references(() => users.id),
   quantity: integer('quantity').notNull().default(1),
   unitPrice: decimal('unit_price', { precision: 10, scale: 2 }).notNull(),
   subtotal: decimal('subtotal', { precision: 10, scale: 2 }).notNull(),
@@ -161,7 +212,7 @@ export const payments = pgTable('payments', {
   method: paymentMethodEnum('method').notNull().default('cash'),
   status: paymentStatusEnum('status').notNull().default('pending'),
   transactionId: varchar('transaction_id', { length: 100 }),
-  processedBy: integer('processed_by').references(() => users.id),
+  processedBy: text('processed_by').references(() => users.id),
   notes: text('notes'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),

@@ -2,20 +2,29 @@
 -- This file inserts all demo data for the POS system
 
 -- =====================================================
--- USERS (Demo accounts)
--- All passwords are: admin123 (in production, use hashed passwords)
+-- USERS (Demo accounts with better-auth compatible structure)
+-- All passwords are hashed using bcrypt (original: admin123)
+-- Password hash generated with: bcrypt.hash('admin123', 10)
 -- =====================================================
-INSERT INTO users (id, username, password, full_name, role, email, phone, is_active) VALUES
-(1, 'admin', 'admin123', 'System Administrator', 'admin', 'admin@restaurant.com', '+1 234 567 8901', TRUE),
-(2, 'manager1', 'admin123', 'John Manager', 'manager', 'manager@restaurant.com', '+1 234 567 8902', TRUE),
-(3, 'server1', 'admin123', 'Sarah Server', 'server', 'server1@restaurant.com', '+1 234 567 8903', TRUE),
-(4, 'server2', 'admin123', 'Mike Waiter', 'server', 'server2@restaurant.com', '+1 234 567 8904', TRUE),
-(5, 'counter1', 'admin123', 'Emily Cashier', 'counter', 'counter1@restaurant.com', '+1 234 567 8905', TRUE),
-(6, 'counter2', 'admin123', 'David Counter', 'counter', 'counter2@restaurant.com', '+1 234 567 8906', TRUE),
-(7, 'kitchen1', 'admin123', 'Chef Gordon', 'kitchen', 'kitchen@restaurant.com', '+1 234 567 8907', TRUE);
+INSERT INTO users (id, username, display_username, email, email_verified, full_name, name, role, phone, is_active) VALUES
+('user_admin_001', 'admin', 'Admin', 'admin@posystem.com', TRUE, 'System Administrator', 'Admin', 'admin', '+1 234 567 8901', TRUE),
+('user_manager_001', 'manager1', 'Manager1', 'manager@posystem.com', TRUE, 'John Manager', 'John', 'manager', '+1 234 567 8902', TRUE),
+('user_server_001', 'server1', 'Server1', 'server1@posystem.com', TRUE, 'Sarah Server', 'Sarah', 'server', '+1 234 567 8903', TRUE),
+('user_server_002', 'server2', 'Server2', 'server2@posystem.com', TRUE, 'Mike Waiter', 'Mike', 'server', '+1 234 567 8904', TRUE),
+('user_counter_001', 'counter1', 'Counter1', 'counter1@posystem.com', TRUE, 'Emily Cashier', 'Emily', 'counter', '+1 234 567 8905', TRUE),
+('user_counter_002', 'counter2', 'Counter2', 'counter2@posystem.com', TRUE, 'David Counter', 'David', 'counter', '+1 234 567 8906', TRUE),
+('user_kitchen_001', 'kitchen1', 'Kitchen1', 'kitchen@posystem.com', TRUE, 'Chef Gordon', 'Gordon', 'kitchen', '+1 234 567 8907', TRUE);
 
--- Reset sequence for users
-SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
+-- Create account entries for credential-based login (better-auth requirement)
+-- Password: admin123 hashed with better-auth's hashPassword function
+INSERT INTO account (id, account_id, provider_id, user_id, password) VALUES
+('acc_admin_001', 'user_admin_001', 'credential', 'user_admin_001', '0358fad5d5a5b56a077b01ab34200ff8:f3d5a5ba689066d592b0a2377f465fb5fdf434b9a9093e61351342a7ef9a6893ca306e45104d528bc02e55acfe43eb76cd2e8901a0897220458b9496089001a6'),
+('acc_manager_001', 'user_manager_001', 'credential', 'user_manager_001', '0358fad5d5a5b56a077b01ab34200ff8:f3d5a5ba689066d592b0a2377f465fb5fdf434b9a9093e61351342a7ef9a6893ca306e45104d528bc02e55acfe43eb76cd2e8901a0897220458b9496089001a6'),
+('acc_server_001', 'user_server_001', 'credential', 'user_server_001', '0358fad5d5a5b56a077b01ab34200ff8:f3d5a5ba689066d592b0a2377f465fb5fdf434b9a9093e61351342a7ef9a6893ca306e45104d528bc02e55acfe43eb76cd2e8901a0897220458b9496089001a6'),
+('acc_server_002', 'user_server_002', 'credential', 'user_server_002', '0358fad5d5a5b56a077b01ab34200ff8:f3d5a5ba689066d592b0a2377f465fb5fdf434b9a9093e61351342a7ef9a6893ca306e45104d528bc02e55acfe43eb76cd2e8901a0897220458b9496089001a6'),
+('acc_counter_001', 'user_counter_001', 'credential', 'user_counter_001', '0358fad5d5a5b56a077b01ab34200ff8:f3d5a5ba689066d592b0a2377f465fb5fdf434b9a9093e61351342a7ef9a6893ca306e45104d528bc02e55acfe43eb76cd2e8901a0897220458b9496089001a6'),
+('acc_counter_002', 'user_counter_002', 'credential', 'user_counter_002', '0358fad5d5a5b56a077b01ab34200ff8:f3d5a5ba689066d592b0a2377f465fb5fdf434b9a9093e61351342a7ef9a6893ca306e45104d528bc02e55acfe43eb76cd2e8901a0897220458b9496089001a6'),
+('acc_kitchen_001', 'user_kitchen_001', 'credential', 'user_kitchen_001', '0358fad5d5a5b56a077b01ab34200ff8:f3d5a5ba689066d592b0a2377f465fb5fdf434b9a9093e61351342a7ef9a6893ca306e45104d528bc02e55acfe43eb76cd2e8901a0897220458b9496089001a6');
 
 -- =====================================================
 -- CATEGORIES
@@ -25,7 +34,7 @@ INSERT INTO categories (id, name, description, icon, sort_order, is_active) VALU
 (2, 'Main Course', 'Hearty main dishes and entrees', 'Beef', 2, TRUE),
 (3, 'Pizza', 'Hand-tossed artisan pizzas', 'Pizza', 3, TRUE),
 (4, 'Beverages', 'Hot and cold drinks', 'Coffee', 4, TRUE),
-(5, 'Desserts', 'Sweet treats and desserts', 'IceCream', 5, TRUE),
+(5, 'Desserts', 'Sweet treats and desserts', 'IceCream', 5, TRUE);
 
 -- Reset sequence for categories
 SELECT setval('categories_id_seq', (SELECT MAX(id) FROM categories));
@@ -54,11 +63,11 @@ INSERT INTO products (id, name, description, price, category_id, emoji, is_avail
 (11, 'Cappuccino', 'Espresso with steamed milk foam', 4.99, 4, '☕', TRUE, 3),
 (12, 'Fresh Juice', 'Freshly squeezed seasonal fruit juice', 5.99, 4, '🧃', TRUE, 4),
 (15, 'Red Wine', 'House red wine by the glass', 12.99, 4, '🍷', TRUE, 1),
-(16, 'Beer', 'Draft beer selection', 6.99, 4, '🍺', TRUE, 1);
+(16, 'Beer', 'Draft beer selection', 6.99, 4, '🍺', TRUE, 1),
 
 -- Desserts (category_id = 5)
 (13, 'Chocolate Cake', 'Rich chocolate layer cake with ganache', 7.99, 5, '🍰', TRUE, 2),
-(14, 'Ice Cream', 'Three scoops of artisan ice cream', 6.99, 5, '🍨', TRUE, 2),
+(14, 'Ice Cream', 'Three scoops of artisan ice cream', 6.99, 5, '🍨', TRUE, 2);
 
 -- Reset sequence for products
 SELECT setval('products_id_seq', (SELECT MAX(id) FROM products));

@@ -3,7 +3,7 @@ import { Store } from '@tanstack/store'
 export type UserRole = 'admin' | 'manager' | 'server' | 'counter' | 'kitchen'
 
 export interface AuthUser {
-  id: number
+  id: string
   username: string
   fullName: string
   role: UserRole
@@ -25,29 +25,14 @@ const initialState: AuthState = {
 
 export const authStore = new Store<AuthState>(initialState)
 
-// Auth actions
+// Auth actions - simplified to work with better-auth
 export const authActions = {
-  login: (user: AuthUser) => {
+  setUser: (user: AuthUser | null) => {
     authStore.setState(() => ({
       user,
-      isAuthenticated: true,
+      isAuthenticated: !!user,
       isLoading: false,
     }))
-    // Store in localStorage for persistence
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('pos_auth_user', JSON.stringify(user))
-    }
-  },
-
-  logout: () => {
-    authStore.setState(() => ({
-      user: null,
-      isAuthenticated: false,
-      isLoading: false,
-    }))
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('pos_auth_user')
-    }
   },
 
   setLoading: (isLoading: boolean) => {
@@ -57,31 +42,12 @@ export const authActions = {
     }))
   },
 
-  initializeAuth: () => {
-    if (typeof window !== 'undefined') {
-      const storedUser = localStorage.getItem('pos_auth_user')
-      if (storedUser) {
-        try {
-          const user = JSON.parse(storedUser) as AuthUser
-          authStore.setState(() => ({
-            user,
-            isAuthenticated: true,
-            isLoading: false,
-          }))
-        } catch {
-          authStore.setState(() => ({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-          }))
-        }
-      } else {
-        authStore.setState((state) => ({
-          ...state,
-          isLoading: false,
-        }))
-      }
-    }
+  logout: () => {
+    authStore.setState(() => ({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+    }))
   },
 }
 
